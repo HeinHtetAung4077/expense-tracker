@@ -36,7 +36,7 @@ const HomePage = () => {
     ],
   };
 
-  const [logout, { loading }] = useMutation(LOGOUT, {
+  const [logout, { loading, client }] = useMutation(LOGOUT, {
     refetchQueries: ["GetAuthenticatedUser"],
   });
 
@@ -44,6 +44,7 @@ const HomePage = () => {
     try {
       await logout();
       // Clear the apollo client cache from the DOCS
+      client.resetStore();
     } catch (error) {
       console.error("Error in logging out");
       toast.error(error.message);
