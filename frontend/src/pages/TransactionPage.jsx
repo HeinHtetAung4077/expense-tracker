@@ -24,7 +24,9 @@ const TransactionPage = () => {
   });
 
   const [updateTransaction, { loading: updatingTransaction }] =
-    useMutation(UPDATE_TRANSACTION);
+    useMutation(UPDATE_TRANSACTION, {
+      refetchQueries: ["GetTransactions","GetTransactionStatistics"]
+    });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
