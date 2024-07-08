@@ -19,6 +19,7 @@ import mergedResolvers from "./resolvers/index.js";
 import { configurePassport } from "./passport/passport.config.js";
 
 import { connectDB } from "./db/connectDB.js";
+import path from "path";
 
 dotenv.config();
 configurePassport();
@@ -47,6 +48,8 @@ app.use(
   })
 );
 
+const __dirname = path.resolve();
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -58,18 +61,25 @@ const server = new ApolloServer({
 await server.start();
 
 app.use(
-	"/graphql",
-	cors({
-		origin: "http://localhost:3000",
-		credentials: true,
-	}),
-	express.json(),
-	// expressMiddleware accepts the same arguments:
-	// an Apollo Server instance and optional configuration options
-	expressMiddleware(server, {
-		context: async ({ req, res }) => buildContext({ req, res }),
-	})
+  "/graphql",
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+  express.json(),
+  // expressMiddleware accepts the same arguments:
+  // an Apollo Server instance and optional configuration options
+  expressMiddleware(server, {
+    context: async ({ req, res }) => buildContext({ req, res }),
+  })
 );
+
+// * render.com
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
+});
 
 // Modified server startup
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
